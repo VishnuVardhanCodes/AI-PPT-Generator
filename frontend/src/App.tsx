@@ -34,29 +34,18 @@ export default function App() {
     setSlides([]);
     
     try {
-      // Step 1: Generating content (Groq)
       setCurrentStep(0);
       const content = await generatePresentationContent(topic, slideCount);
       
-      // Step 2: Fetching images (Unsplash)
       setCurrentStep(1);
-      const fullSlides: FullSlide[] = [];
-      
-      // Process images in parallel
       const imagePromises = content.map(async (slide) => {
         const imageUrl = await fetchSlideImage(slide.imageKeyword || slide.heading);
         return { ...slide, imageUrl };
       });
       
       const results = await Promise.all(imagePromises);
-      fullSlides.push(...results);
-      
-      // Step 3: Building PPT (Preparing data)
-      setCurrentStep(2);
-      setSlides(fullSlides);
-      
-      // Step 4: Ready!
       setCurrentStep(3);
+      setSlides(results);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'An unexpected error occurred. Please check your API keys.');
@@ -86,17 +75,22 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-from),_transparent_80%),radial-gradient(circle_at_bottom_left,_var(--tw-gradient-to),_transparent_80%)] from-primary/5 to-accent/5 overflow-x-hidden">
+    <div className="min-h-screen relative selection:bg-primary/30">
+      {/* Animated Background Layers */}
+      <div className="fixed inset-0 bg-[#030712] -z-20" />
+      <div className="fixed inset-0 bg-animate opacity-30 -z-10" />
+      
       <Header />
 
-      <main className="container mx-auto px-4 pb-20">
+      <main className="container mx-auto px-6 pb-32">
         <AnimatePresence mode="wait">
           {!slides.length && !isLoading && !error && (
             <motion.div
               key="input"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, y: -40 }}
+              transition={{ type: "spring", damping: 20, stiffness: 100 }}
             >
               <TopicInput 
                 topic={topic}
@@ -112,10 +106,10 @@ export default function App() {
           {isLoading && (
             <motion.div
               key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="py-12"
+              className="py-20"
             >
               <ProgressBar currentStep={currentStep} />
               <Loader />
@@ -127,22 +121,24 @@ export default function App() {
               key="error"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="max-w-2xl mx-auto mt-12 p-8 bg-red-50 border border-red-100 rounded-3xl"
+              className="max-w-2xl mx-auto mt-12 p-12 glass-card border-red-500/20 text-center"
             >
-              <div className="flex items-start gap-4 text-red-600 mb-6">
-                <AlertCircle className="w-8 h-8 shrink-0" />
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Oops! Something went wrong</h3>
-                  <p className="font-medium opacity-90">{error}</p>
+              <div className="flex flex-col items-center gap-6">
+                <div className="p-4 bg-red-500/10 rounded-full">
+                  <AlertCircle className="w-12 h-12 text-red-500" />
                 </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-3">Generation Failed</h3>
+                  <p className="text-slate-400 font-medium leading-relaxed">{error}</p>
+                </div>
+                <button 
+                  onClick={handleReset}
+                  className="mt-4 px-8 py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 transition-all flex items-center justify-center gap-3 shadow-lg shadow-red-500/20"
+                >
+                  <RefreshCw className="w-5 h-5" />
+                  Try Again Now
+                </button>
               </div>
-              <button 
-                onClick={handleReset}
-                className="w-full py-4 bg-red-600 text-white font-bold rounded-2xl hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <RefreshCw className="w-5 h-5" />
-                Try Again
-              </button>
             </motion.div>
           )}
 
@@ -151,6 +147,7 @@ export default function App() {
               key="preview"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
+              className="space-y-20"
             >
               <SlidePreview 
                 slides={slides} 
@@ -159,23 +156,41 @@ export default function App() {
                 isDownloading={isDownloading}
               />
               
-              <div className="flex justify-center mt-12">
-                <button 
-                  onClick={handleReset}
-                  className="flex items-center gap-2 text-slate-400 hover:text-primary font-bold transition-colors uppercase tracking-widest text-sm"
+              <div className="flex justify-center">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1 }}
+                  className="glass-card p-1 items-center overflow-hidden border-white/5"
                 >
-                  <RefreshCw className="w-4 h-4" />
-                  Generate Another One
-                </button>
+                  <button 
+                    onClick={handleReset}
+                    className="flex items-center gap-3 px-10 py-5 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-bold transition-all uppercase tracking-[0.2em] text-xs rounded-[1.5rem] group"
+                  >
+                    <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+                    Create New Presentation
+                  </button>
+                </motion.div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
 
-      <footer className="py-12 text-center text-slate-400 text-sm font-medium">
-        <p>© {new Date().getFullYear()} AI PPT Generator. All rights reserved.</p>
-        <p className="mt-1">Powered by Groq & Unsplash</p>
+      <footer className="py-20 text-center space-y-4 border-t border-white/5 bg-black/20 backdrop-blur-sm">
+        <div className="flex justify-center gap-6 mb-8 opacity-50">
+           <Presentation className="w-5 h-5" />
+           <Sparkles className="w-5 h-5" />
+           <Wand2 className="w-5 h-5" />
+        </div>
+        <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
+          © {new Date().getFullYear()} AI PPT Generator — Future of Content
+        </p>
+        <div className="flex justify-center gap-4 text-slate-600 text-[10px] font-black uppercase tracking-widest">
+          <span>Powered by Groq Llama 3.3</span>
+          <span className="w-1 h-1 bg-slate-800 rounded-full mt-1" />
+          <span>Unsplash API</span>
+        </div>
       </footer>
     </div>
   );
