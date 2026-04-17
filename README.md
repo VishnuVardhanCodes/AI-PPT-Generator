@@ -1,20 +1,61 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🎨 AI PPT Generator (Frontend)
 
-# Run and deploy your AI Studio app
+Welcome to the **AI PPT Generator**! This application leverages the power of **Groq Cloud (LLaMA 3)** and **PptxGenJS** to transform a simple topic into a professional, multi-slide PowerPoint presentation with relevant images and structured content in seconds.
 
-This contains everything you need to run your app locally.
+## 🚀 Get Started
 
-View your app in AI Studio: https://ai.studio/apps/db8437b0-1345-4c5f-9144-ef41420b8457
+### 1. Configure Environment
+Create a `.env` file in the `frontend/` directory:
+```env
+VITE_GROQ_API_KEY=your_groq_api_key_here
+```
 
-## Run Locally
+### 2. Installation
+Install the required dependencies:
+```bash
+npm install
+```
 
-**Prerequisites:**  Node.js
+### 3. Development Mode
+Start the development server:
+```bash
+npm run dev
+```
 
+### 4. Build for Production
+```bash
+npm run build
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🛠 Features
+
+-   **Intelligent Topic Analysis**: Generates comprehensive presentation outlines based on a single topic.
+-   **Structured Slides**: Automatic generation of Title, Content, and Conclusion slides.
+-   **Image Integration**: Uses relevant keywords to fetch high-quality images for each slide.
+-   **One-Click Download**: Generates a `.pptx` file ready for use.
+-   **High Fidelity UI**: Dark-themed, modern interface with smooth animations and professional aesthetics.
+
+## 🏗 Technology Stack
+
+-   **Frontend**: React + TypeScript
+-   **Build Tool**: Vite
+-   **LLM Integration**: Groq API (Meta LLaMA 3)
+-   **Icons**: Lucide React
+-   **Animations**: Framer Motion (Optional/Included)
+
+## 📂 Project Structure
+
+```text
+frontend/
+├── src/
+│   ├── components/   # UI Components
+│   ├── services/     # AI and PPT Logic
+│   ├── styles/       # Global & Component Styles
+│   └── utils/        # Helper functions
+├── .env              # API Keys (Git ignored)
+├── index.html        # Entry Point
+└── package.json      # Dependencies
+```
+
+## ⚖ License
+This project is licensed under the MIT License.
