@@ -9,10 +9,11 @@ import { TopicInput } from './components/TopicInput';
 import { ProgressBar } from './components/ProgressBar';
 import { Loader } from './components/Loader';
 import { SlidePreview } from './components/SlidePreview';
+import { Workflow } from './components/Workflow';
 import { generatePresentationContent, SlideContent } from './services/groqService';
 import { fetchSlideImage } from './services/imageService';
 import { generatePptFile } from './services/pptService';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, RefreshCw, Presentation, Sparkles, Wand2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 type FullSlide = SlideContent & { imageUrl: string };
@@ -100,6 +101,7 @@ export default function App() {
                 onGenerate={handleGenerate}
                 isLoading={isLoading}
               />
+              <Workflow />
             </motion.div>
           )}
 
